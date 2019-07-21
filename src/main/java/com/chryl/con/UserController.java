@@ -7,6 +7,10 @@ import com.chryl.bean.User;
 import com.chryl.bean.UserModel;
 import com.chryl.mapper.UserMapper;
 import com.chryl.utils.JwtUtil;
+import com.sun.org.apache.regexp.internal.RE;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * <p>
  * Created By Chr on 2019/7/19.
  */
+@Api(value = "用户接口", description = "login/get")
 @RestController
 @RequestMapping("/v2/user")
 public class UserController {
@@ -23,6 +28,10 @@ public class UserController {
     private UserMapper userMapper;
 
     //登陆不验证jwt,只生成jwt
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "username", value = "用户名", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "password", value = "密码", required = true, dataType = "String")
+    })
     @PassToken
     @PostMapping(value = "/login")
     public Object login(@RequestParam("username") String username,
@@ -47,6 +56,7 @@ public class UserController {
     }
 
     //查看个人信息,验证jwt
+    @ApiImplicitParam(paramType = "path", name = "id", value = "用户id", required = true, dataType = "String")
     @CheckToken
     @GetMapping("/getMessage/{id}")
     public String getMessage(@PathVariable("id") String id) {
@@ -56,7 +66,7 @@ public class UserController {
 
     private UserModel convertUserModelFromUser(User user) {
         UserModel userModel = new UserModel();
-        BeanUtils.copyProperties(user,userModel);
+        BeanUtils.copyProperties(user, userModel);
         return userModel;
     }
 
